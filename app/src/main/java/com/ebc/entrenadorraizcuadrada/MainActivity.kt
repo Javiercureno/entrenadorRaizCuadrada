@@ -71,6 +71,7 @@ fun MainScreen() {
             mensajeFeedback = "¡Correcto!"
             resultado = "✔ $numeroActual → $respuestaUsuario (Correcto)"
             pista = ""
+            esCorrecto = true // <- CORRECTO AQUÍ
         } else {
             mensajeFeedback = "Incorrecto. La raíz de $numeroActual es $raizCorrecta."
             resultado = "✘ $numeroActual → $respuestaUsuario (Correcto: $raizCorrecta)"
