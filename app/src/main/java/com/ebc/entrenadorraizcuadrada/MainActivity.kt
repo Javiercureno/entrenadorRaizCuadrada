@@ -37,6 +37,7 @@ fun MainScreen() {
     var juegoIniciado by remember { mutableStateOf(false) }
     var respuestaVerificada by remember { mutableStateOf(false) }
     var resultadosRecientes by remember { mutableStateOf(listOf<String>()) }
+    var pista by remember { mutableStateOf("") }
 
     fun generarNuevoDesafio() {
         val base = Random.nextInt(2, 51)
@@ -46,6 +47,7 @@ fun MainScreen() {
         mensajeFeedback = "Ingresa la raíz cuadrada"
         juegoIniciado = true
         respuestaVerificada = false
+        pista = ""
     }
 
     fun verificarRespuesta() {
@@ -54,9 +56,15 @@ fun MainScreen() {
         if (respuesta == raizCorrecta) {
             mensajeFeedback = "¡Correcto!"
             resultado = "✔ $numeroActual → $respuestaUsuario (Correcto)"
+            pista = ""
         } else {
             mensajeFeedback = "Incorrecto. La raíz de $numeroActual es $raizCorrecta."
             resultado = "✘ $numeroActual → $respuestaUsuario (Correcto: $raizCorrecta)"
+            val menor = raizCorrecta - 1
+            val mayor = raizCorrecta + 1
+            val menorCuadrado = menor * menor
+            val mayorCuadrado = mayor * mayor
+            pista = "Pista: la raíz está entre la de $menorCuadrado (= $menor) y la de $mayorCuadrado (= $mayor)"
         }
         resultadosRecientes = (listOf(resultado) + resultadosRecientes).take(5)
         respuestaVerificada = true
@@ -87,6 +95,9 @@ fun MainScreen() {
             Text("Comprobar")
         }
         Text(text = mensajeFeedback)
+        if (pista.isNotEmpty()) {
+            Text(text = pista, color = MaterialTheme.colorScheme.primary)
+        }
         Button(
             onClick = { generarNuevoDesafio() },
             enabled = !juegoIniciado || respuestaVerificada
