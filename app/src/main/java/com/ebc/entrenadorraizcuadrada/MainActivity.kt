@@ -1,5 +1,16 @@
 package com.ebc.entrenadorraizcuadrada
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,9 +49,11 @@ fun MainScreen() {
     var respuestaVerificada by remember { mutableStateOf(false) }
     var resultadosRecientes by remember { mutableStateOf(listOf<String>()) }
     var pista by remember { mutableStateOf("") }
+    var mostrarAnimacion by remember { mutableStateOf(false) }
+    var esCorrecto by remember { mutableStateOf(false) }
 
     fun generarNuevoDesafio() {
-        val base = Random.nextInt(2, 51)
+        val base = Random.nextInt(2, 21)
         numeroActual = base * base
         raizCorrecta = base
         respuestaUsuario = ""
@@ -48,6 +61,7 @@ fun MainScreen() {
         juegoIniciado = true
         respuestaVerificada = false
         pista = ""
+        mostrarAnimacion = false
     }
 
     fun verificarRespuesta() {
@@ -65,9 +79,11 @@ fun MainScreen() {
             val menorCuadrado = menor * menor
             val mayorCuadrado = mayor * mayor
             pista = "Pista: la raíz está entre la de $menorCuadrado (= $menor) y la de $mayorCuadrado (= $mayor)"
+            esCorrecto = false
         }
-        resultadosRecientes = (listOf(resultado) + resultadosRecientes).take(5)
+        resultadosRecientes = (listOf(resultado) + resultadosRecientes).take(10)
         respuestaVerificada = true
+        mostrarAnimacion = true
     }
 
     Column(
@@ -93,6 +109,31 @@ fun MainScreen() {
             enabled = juegoIniciado && !respuestaVerificada && respuestaUsuario.isNotEmpty()
         ) {
             Text("Comprobar")
+        }
+        AnimatedVisibility(
+            visible = mostrarAnimacion,
+            enter = scaleIn(animationSpec = tween(500)),
+            exit = scaleOut(animationSpec = tween(500))
+        ) {
+            if (esCorrecto) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(Color(0xFF4CAF50), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Check, contentDescription = "Correcto", tint = Color.White, modifier = Modifier.scale(1.5f))
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(Color(0xFFF44336), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Incorrecto", tint = Color.White, modifier = Modifier.scale(1.5f))
+                }
+            }
         }
         Text(text = mensajeFeedback)
         if (pista.isNotEmpty()) {
