@@ -1,5 +1,13 @@
 package com.ebc.entrenadorraizcuadrada
 
+import androidx.compose.ui.platform.LocalContext
+
+import androidx.lifecycle.lifecycleScope
+import com.ebc.entrenadorraizcuadrada.db.AppDatabase
+import com.ebc.entrenadorraizcuadrada.db.Resultado
+import kotlinx.coroutines.launch
+
+
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -52,6 +60,9 @@ fun MainScreen() {
     var mostrarAnimacion by remember { mutableStateOf(false) }
     var esCorrecto by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     fun generarNuevoDesafio() {
         val base = Random.nextInt(2, 21)
         numeroActual = base * base
@@ -85,6 +96,21 @@ fun MainScreen() {
         resultadosRecientes = (listOf(resultado) + resultadosRecientes).take(10)
         respuestaVerificada = true
         mostrarAnimacion = true
+
+        // Guardar en la base de datos
+        scope.launch {
+            val db = AppDatabase.getDatabase(context.applicationContext)
+            db.resultadoDao().insertar(
+                Resultado(
+                    numero = numeroActual,
+                    respuesta = respuesta ?: -1,
+                    correcto = (respuesta == raizCorrecta),
+                    fechaHora = System.currentTimeMillis()
+                )
+            )
+        }
+
+
     }
 
     Column(
