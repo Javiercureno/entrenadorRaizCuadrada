@@ -43,6 +43,8 @@ android {
 }
 
 dependencies {
+    kapt("androidx.room:room-compiler:2.7.1")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -61,7 +63,15 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("io.ktor:ktor-client-core:2.3.7")
+    implementation("io.ktor:ktor-client-android:2.3.7")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
 
-    kapt("androidx.room:room-compiler:2.7.1")
+
+
+
+
+
 
 }

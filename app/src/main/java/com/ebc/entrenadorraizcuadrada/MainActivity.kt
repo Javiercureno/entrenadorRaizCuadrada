@@ -37,6 +37,14 @@ import androidx.core.app.ActivityCompat
 import com.ebc.entrenadorraizcuadrada.ui.theme.EntrenadorRaizCuadradaTheme
 import kotlin.random.Random
 
+
+import io.ktor.client.*
+import io.ktor.client.engine.android.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+
+
+
 class MainActivity : ComponentActivity() {
 
     // Solicitud de permiso para notificaciones
@@ -98,6 +106,7 @@ fun MainScreen() {
     var mostrarAnimacion by remember { mutableStateOf(false) }
     var esCorrecto by remember { mutableStateOf(false) }
     var rachaCorrectas by remember { mutableStateOf(0) }
+    var trivia by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -112,6 +121,11 @@ fun MainScreen() {
         respuestaVerificada = false
         pista = ""
         mostrarAnimacion = false
+        trivia = ""
+        // Llama a la API de trivia
+        scope.launch {
+            trivia = obtenerTriviaNumero(numeroActual)
+        }
     }
 
     fun verificarRespuesta() {
@@ -208,6 +222,13 @@ fun MainScreen() {
         if (pista.isNotEmpty()) {
             Text(text = pista, color = MaterialTheme.colorScheme.primary)
         }
+        if (trivia.isNotEmpty()) {
+            Text(
+                text = "Dato curioso: $trivia",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
         Button(
             onClick = { generarNuevoDesafio() },
             enabled = !juegoIniciado || respuestaVerificada
@@ -246,3 +267,17 @@ fun mostrarNotificacionLogro(context: Context) {
     val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     manager.notify(1, builder.build())
 }
+
+suspend fun obtenerTriviaNumero(numero: Int): String {
+    val client = HttpClient(Android)
+    return try {
+        val response: HttpResponse = client.get("http://numbersapi.com/$numero/trivia")
+        response.bodyAsText()
+    } catch (e: Exception) {
+        "No se pudo obtener trivia."
+    } finally {
+        client.close()
+    }
+}
+
+
